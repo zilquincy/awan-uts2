@@ -2,44 +2,126 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TransKota — Transportasi Kota Bandung</title>
-  <!-- Aset CSS/JS wajib diakses via CloudFront -->
-  <link rel="stylesheet"
-    href="https://d24ajgkryjbl5.cloudfront.net/static/style.css">
+  <link rel="stylesheet" href="https://d24ajgkryjbl5.cloudfront.net/static/style.css">
 </head>
 <body>
+
   <nav>
-    <h1>🚌 TransKota</h1>
+    <h1>TransKota</h1>
     <a href="#rute">Info Rute</a>
     <a href="#laporan">Laporan</a>
     <a href="#monitoring">Monitoring</a>
   </nav>
 
+  <div class="status-bar">
+    <div class="status-item">
+      <span class="status-dot green"></span>
+      <span>Sistem Online</span>
+    </div>
+    <div class="status-item">
+      <span class="status-dot yellow"></span>
+      <span id="status-rute">Memuat rute...</span>
+    </div>
+    <div class="status-item">
+      <span class="status-dot green"></span>
+      <span id="status-laporan">Memuat laporan...</span>
+    </div>
+    <div class="status-item">
+      <span class="status-dot green"></span>
+      <span id="status-time">--:--:--</span>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div>
+      <div class="hero-tag">Kota Bandung</div>
+      <h2>Sistem Monitoring<br><span>Transportasi Umum</span></h2>
+      <p>Pantau rute, laporkan kemacetan, dan cek status kendaraan umum Kota Bandung secara semi real-time.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-number" id="hero-rute-count">—</div>
+        <div class="stat-label">Rute Aktif</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">MJT</div>
+        <div class="stat-label">Metro Jabar Trans</div>
+      </div>
+    </div>
+  </div>
+
   <!-- FITUR 1: Info Rute -->
   <section id="rute">
-    <h2>Informasi Rute & Jadwal</h2>
+    <div class="section-header">
+      <h2 data-icon="🚌">Informasi Rute & Jadwal</h2>
+      <span class="section-label">Live</span>
+    </div>
     <div id="daftar-rute"></div>
   </section>
 
   <!-- FITUR 2: Laporan -->
   <section id="laporan">
-    <h2>Buat Laporan Kemacetan / Kecelakaan</h2>
-    <select id="jenis">
-      <option value="kemacetan">Kemacetan</option>
-      <option value="kecelakaan">Kecelakaan</option>
-    </select>
-    <input type="text" id="lokasi" placeholder="Lokasi kejadian">
-    <textarea id="deskripsi" placeholder="Deskripsi"></textarea>
-    <input type="file" id="foto" accept="image/*">
-    <button onclick="kirimLaporan()">Kirim Laporan</button>
-    <div id="hasil-laporan"></div>
+    <div class="section-header">
+      <h2 data-icon="📋">Pelaporan Masyarakat</h2>
+      <span class="section-label">Kemacetan & Kecelakaan</span>
+    </div>
+    <div class="form-card">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Jenis Laporan</label>
+          <select id="jenis">
+            <option value="kemacetan">🚦 Kemacetan</option>
+            <option value="kecelakaan">🚨 Kecelakaan</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Lokasi Kejadian</label>
+          <input type="text" id="lokasi" placeholder="Contoh: Jl. Asia Afrika">
+        </div>
+        <div class="form-group full">
+          <label>Deskripsi</label>
+          <textarea id="deskripsi" placeholder="Jelaskan situasi yang terjadi..."></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Foto Kejadian (Opsional)</label>
+          <div class="file-upload-area">
+            <input type="file" id="foto" accept="image/*">
+            <div class="file-upload-icon">📷</div>
+            <div class="file-upload-text">Klik atau drag foto ke sini</div>
+            <div class="file-upload-hint">JPG, PNG maksimal 5MB</div>
+          </div>
+          <div class="file-preview">✅ <span id="file-name">File dipilih</span></div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-ghost" onclick="document.getElementById('lokasi').value='';document.getElementById('deskripsi').value=''">Reset</button>
+        <button class="btn btn-primary" id="btn-kirim" onclick="kirimLaporan()">
+          <span class="btn-text">Kirim Laporan</span>
+          <div class="spinner"></div>
+        </button>
+      </div>
+    </div>
+    <div id="hasil-laporan-list"></div>
   </section>
 
   <!-- FITUR 3: Monitoring -->
   <section id="monitoring">
-    <h2>Status Kendaraan (Semi Real-time)</h2>
+    <div class="section-header">
+      <h2 data-icon="📡">Status Kendaraan</h2>
+      <span class="section-label">Semi Real-time</span>
+    </div>
     <div id="data-monitoring"></div>
   </section>
+
+  <footer>
+    <div class="footer-brand">TransKota</div>
+    <div class="footer-text">
+      Sistem Monitoring Transportasi Kota Bandung<br>
+      Institut Teknologi Nasional — Cloud Computing 2025
+    </div>
+  </footer>
 
   <script src="https://d24ajgkryjbl5.cloudfront.net/static/app.js"></script>
 </body>
