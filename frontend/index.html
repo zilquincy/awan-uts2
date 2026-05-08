@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>TransKota — Transportasi Kota Bandung</title>
+  <!-- Aset CSS/JS wajib diakses via CloudFront -->
+  <link rel="stylesheet"
+    href="{{ cloudfront_url }}/static/css/style.css">
+</head>
+<body>
+  <nav>
+    <h1>🚌 TransKota</h1>
+    <a href="#rute">Info Rute</a>
+    <a href="#laporan">Laporan</a>
+    <a href="#monitoring">Monitoring</a>
+  </nav>
+
+  <!-- FITUR 1: Info Rute -->
+  <section id="rute">
+    <h2>Informasi Rute & Jadwal</h2>
+    <div id="daftar-rute"></div>
+  </section>
+
+  <!-- FITUR 2: Laporan -->
+  <section id="laporan">
+    <h2>Buat Laporan Kemacetan / Kecelakaan</h2>
+    <select id="jenis">
+      <option value="kemacetan">Kemacetan</option>
+      <option value="kecelakaan">Kecelakaan</option>
+    </select>
+    <input type="text" id="lokasi" placeholder="Lokasi kejadian">
+    <textarea id="deskripsi" placeholder="Deskripsi"></textarea>
+    <input type="file" id="foto" accept="image/*">
+    <button onclick="kirimLaporan()">Kirim Laporan</button>
+    <div id="hasil-laporan"></div>
+  </section>
+
+  <!-- FITUR 3: Monitoring -->
+  <section id="monitoring">
+    <h2>Status Kendaraan (Semi Real-time)</h2>
+    <div id="data-monitoring"></div>
+  </section>
+
+  <script src="{{ cloudfront_url }}/static/js/app.js"></script>
+</body>
+</html>
