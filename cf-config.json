@@ -1,0 +1,32 @@
+{
+  "CallerReference": "transkota-152023064",
+  "Comment": "TransKota CDN",
+  "DefaultCacheBehavior": {
+    "TargetOriginId": "transkota-s3",
+    "ViewerProtocolPolicy": "redirect-to-https",
+    "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+    "AllowedMethods": {
+      "Quantity": 2,
+      "Items": ["GET", "HEAD"],
+      "CachedMethods": {
+        "Quantity": 2,
+        "Items": ["GET", "HEAD"]
+      }
+    }
+  },
+  "Origins": {
+    "Quantity": 1,
+    "Items": [
+      {
+        "Id": "transkota-s3",
+        "DomainName": "transkota-files-152023064.s3.ap-southeast-1.amazonaws.com",
+        "S3OriginConfig": {
+          "OriginAccessIdentity": ""
+        },
+        "OriginAccessControlId": "E1QA6GZYXIHANY"
+      }
+    ]
+  },
+  "Enabled": true,
+  "PriceClass": "PriceClass_All"
+}

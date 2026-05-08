@@ -1,0 +1,60 @@
+{
+  "family": "transkota-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::700555017211:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::700555017211:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "transkota-app",
+      "image": "700555017211.dkr.ecr.ap-southeast-1.amazonaws.com/transkota-app:latest",
+      "portMappings": [
+        {
+          "containerPort": 5000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "DB_HOST",
+          "value": "transkota-db.cfyk8wgyqqvr.ap-southeast-1.rds.amazonaws.com"
+        },
+        {
+          "name": "DB_NAME",
+          "value": "transkota"
+        },
+        {
+          "name": "DB_USER",
+          "value": "admintranskota"
+        },
+        {
+          "name": "DB_PASS",
+          "value": "Transkota2024!"
+        },
+        {
+          "name": "S3_BUCKET",
+          "value": "transkota-files-152023064"
+        },
+        {
+          "name": "CLOUDFRONT_URL",
+          "value": "https://d24ajgkryjbl5.cloudfront.net"
+        },
+        {
+          "name": "AWS_REGION",
+          "value": "ap-southeast-1"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/transkota-app",
+          "awslogs-region": "ap-southeast-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "essential": true
+    }
+  ]
+}

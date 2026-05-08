@@ -1,0 +1,90 @@
+name: Deploy TransKota ke AWS ECS
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+  ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
+  ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
+  CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+
+jobs:
+  deploy:
+    name: Build, Push, Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout kode ──────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Konfigurasi AWS credentials ───────────────
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # ── 3. Login ke Amazon ECR ────────────────────────
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # ── 4. Build, Tag, dan Push Docker image ke ECR ───
+      - name: Build, tag, and push image to ECR
+        id: build-image
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      # ── 5. Sync file statis ke S3 ─────────────────────
+      - name: Sync static files to S3
+        run: |
+          aws s3 sync frontend/static/ \
+            s3://${{ secrets.S3_BUCKET }}/static/ \
+            --delete
+
+      # ── 6. Invalidate CloudFront cache ────────────────
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/static/*"
+
+      # ── 7. Ambil Task Definition terbaru ──────────────
+      - name: Download current ECS task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition transkota-task \
+            --query taskDefinition \
+            > task-definition.json
+
+      # ── 8. Update image di Task Definition ────────────
+      - name: Update ECS task definition with new image
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
+
+      # ── 9. Deploy ke ECS Service ──────────────────────
+      - name: Deploy to Amazon ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true

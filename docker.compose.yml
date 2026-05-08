@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=transkota
+      - DB_USER=admintranskota
+      - DB_PASS=Transkota2024!
+      - S3_BUCKET=transkota-files-152023064
+      - CLOUDFRONT_URL=https://d24ajgkryjbl5.cloudfront.net
+      - AWS_REGION=ap-southeast-1
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=transkota
+      - POSTGRES_USER=admintranskota
+      - POSTGRES_PASSWORD=Transkota2024!
+    ports:
+      - "5432:5432"
